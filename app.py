@@ -70,28 +70,29 @@ st.divider()
 
 # --- ÁREA DE ANOTAÇÃO ---
 if st.session_state.words:
-    col_edit, col_view = st.columns([1, 2])
+    # Definindo 1 para controles e 4 para a árvore (espaço máximo)
+    col_edit, col_view = st.columns([1, 4])
     
     with col_edit:
-        st.subheader("Configuração")
+        st.markdown("### ⚙️ Ajustes")
         w_opts = [f"{w['id']}: {w['form']}" for w in st.session_state.words]
         
-        # Ordem: PAI primeiro (conforme solicitado)
-        sel_head = st.selectbox("PALAVRA PAI (HEAD)", ["0: ROOT"] + w_opts)
+        # Colocando os seletores em pares para economizar largura
+        c1, c2 = st.columns(2)
+        with c1:
+            sel_head = st.selectbox("PAI", ["0: ROOT"] + w_opts)
+            sel_rel = st.selectbox("RELAÇÃO", RELATIONS)
+        with c2:
+            sel_idx = st.selectbox("FILHO", range(len(w_opts)), format_func=lambda x: w_opts[x])
+            sel_morph = st.selectbox("CLASSE", list(MORPHO_COLORS.keys()))
         
-        # FILHO (Dependente)
-        sel_idx = st.selectbox("PALAVRA FILHO", range(len(w_opts)), format_func=lambda x: w_opts[x])
-        
-        # Etiquetas Completas
-        sel_rel = st.selectbox("RELAÇÃO SINTÁTICA", RELATIONS)
-        sel_morph = st.selectbox("CLASSE GRAMATICAL", list(MORPHO_COLORS.keys()))
-        
-        if st.button("VINCULAR E ATUALIZAR 🔄"):
+        st.divider()
+        if st.button("VINCULAR 🔄", use_container_width=True):
             st.session_state.words[sel_idx]['head'] = sel_head.split(":")[0]
             st.session_state.words[sel_idx]['relation'] = sel_rel
             st.session_state.words[sel_idx]['postag'] = sel_morph
             st.rerun()
 
     with col_view:
-        st.subheader("Árvore Sintática")
+        # Aqui a árvore terá 80% da largura da tela para brilhar
         st.graphviz_chart(render_tree(st.session_state.words))
