@@ -7,17 +7,24 @@ st.set_page_config(layout="wide", page_title="Arethusa Editor")
 
 # Cores Filológicas (Mantendo a estética)
 MORPHO_COLORS = {
-    "Substantivo": "royalblue", "Verbo": "crimson", "Adjetivo": "seagreen",
-    "Artigo": "#555555", "Pronome": "darkorchid", "Advérbio": "darkorange",
-    "Preposição": "saddlebrown", "Conjunção": "darkcyan", "Partícula": "goldenrod", 
-    "Pontuação": "black", "Artificial": "purple"
+    "Substantivo": "forestgreen",   # Verde Floresta
+    "Verbo": "crimson",             # Mantido (Vermelho)
+    "Adjetivo": "royalblue",        # Azul Royal
+    "Artigo": "darkcyan",           # Ciano Escuro (que dá o tom azul claro)
+    "Pronome": "#8C2E64",           # Bordeaux (seu código específico)
+    "Advérbio": "darkorange",       # Mantido
+    "Preposição": "#006060",        # Verde Petróleo (Teal escuro)
+    "Conjunção": "hotpink",         # Hot Pink (Rosa forte)
+    "Partícula": "goldenrod",       # Mantido (Dourado)
+    "Pontuação": "black",           # Mantido
+    "Artificial": "purple"          # Mantido
 }
 
 # 2. TODAS AS ETIQUETAS QUE VOCÊ PRECISA
 RELATIONS = sorted([
     "PRED", "SBJ", "OBJ", "ADV", "ATR", "PNOM", "COORD", "APOS", 
     "PRED_CO", "SBJ_CO", "OBJ_CO", "ADV_CO", "ATR_CO", "PNOM_CO", 
-    "AuxP", "AuxC", "AuxR", "AuxV", "AuxK", "AuxX", "ExD", "OBJ_AP", "SBJ_AP"
+    "AuxP", "AuxC", "AuxY", "AuxZ", "AuxG", "AuxK", "AuxX", "ExD", "OBJ_AP", "SBJ_AP"
 ])
 
 if 'words' not in st.session_state:
