@@ -35,9 +35,9 @@ def render_tree(words):
     dot = Digraph()
     dot.attr(rankdir='TB', nodesep='0.5', ranksep='0.8')
     # Fonte 14 ou 16 é o limite de segurança para o Streamlit não "espremer"
-    dot.attr('node', fontname='Arial', fontsize='16', shape='none') 
+    dot.attr('node', fontname='Alegreya', fontsize='18', shape='none') 
     
-    dot.node("0", "ROOT", fontcolor="red", fontsize="18")
+    dot.node("0", "ROOT", fontcolor="red", fontsize="20")
     
     for w in words:
         color = MORPHO_COLORS.get(w['postag'], "black")
