@@ -116,7 +116,7 @@ if st.session_state.words:
         st.divider()
         st.markdown("### 📥 Exportar")
 
-        # Gerar XML
+        # Gerar XML (Isso funciona perfeitamente)
         xml_data = export_xml(st.session_state.words)
         st.download_button(
             label="📦 Baixar XML",
@@ -126,23 +126,12 @@ if st.session_state.words:
             use_container_width=True
         )
         
-        # --- BOTÃO PNG ---
-        # Geramos a imagem novamente em formato PNG (bytes)
-        graph = render_tree(st.session_state.words, format_type='png')
-        
-        # O Graphviz no Streamlit às vezes retorna o caminho do arquivo, 
-        # então lemos os bytes desse arquivo:
-        
-        with open(graph, "rb") as f:
-            png_bytes = f.read()
-            
-        st.download_button(
-            label="🖼️ Baixar Árvore (PNG)",
-            data=png_bytes,
-            file_name="arvore_sintatica.png",
-            mime="image/png",
-            use_container_width=True
-        )
+        st.info("💡 Para salvar a imagem, clique com o botão direito na árvore e selecione 'Salvar imagem como'.")
+
+    with col_view:
+        # Aqui a árvore terá 80% da largura da tela para brilhar
+        # Chamamos a função sem o parâmetro format_type para evitar o erro
+        st.graphviz_chart(render_tree(st.session_state.words))
 
     with col_view:
         # Aqui a árvore terá 80% da largura da tela para brilhar
