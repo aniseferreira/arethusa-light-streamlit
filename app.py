@@ -28,14 +28,30 @@ if 'words' not in st.session_state:
     st.session_state.words = []
 
 def render_tree(words):
+    # Aumentamos o DPI para a imagem não perder nitidez
     dot = Digraph(format='svg')
-    dot.attr(rankdir='TB', nodesep='1.0', ranksep='0.8')
-    dot.node("0", "ROOT", fontcolor="red", fontsize="24", shape="none")
+    dot.attr(dpi='300') 
+    
+    # Forçamos o tamanho da fonte global da árvore
+    dot.attr('node', fontsize='30', fontname='Arial')
+    dot.attr(rankdir='TB', nodesep='1.5', ranksep='1.2')
+    
+    dot.node("0", "ROOT", fontcolor="red", fontsize="35", shape="none")
+    
     for w in words:
         color = MORPHO_COLORS.get(w['postag'], "black")
-        lbl = f'<<table border="0"><tr><td><font point-size="22" color="{color}"><b>{w["form"]}</b></font></td></tr><tr><td><font point-size="16">{w["relation"]}</font></td></tr></table>>'
+        
+        # Usamos HTML label para garantir que o texto da palavra seja GRANDE
+        # O "point-size" aqui é o segredo para vencer o 1mm de altura
+        lbl = f'''<
+        <table border="0" cellborder="0" cellspacing="0">
+          <tr><td><font point-size="32" color="{color}"><b>{w["form"]}</b></font></td></tr>
+          <tr><td><font point-size="20" color="#666666">{w["relation"]}</font></td></tr>
+        </table>>'''
+        
         dot.node(w['id'], lbl, shape="none")
-        dot.edge(w['head'], w['id'], color="#cccccc")
+        dot.edge(w['head'], w['id'], color="#cccccc", penwidth="2.0")
+        
     return dot
 
 st.title("🏛️ Arethusa Streamlit Edition")
