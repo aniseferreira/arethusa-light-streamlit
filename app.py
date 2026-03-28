@@ -95,7 +95,6 @@ if st.session_state.words:
         st.markdown("### ⚙️ Ajustes")
         w_opts = [f"{w['id']}: {w['form']}" for w in st.session_state.words]
         
-        # Colocando os seletores em pares para economizar largura
         c1, c2 = st.columns(2)
         with c1:
             sel_head = st.selectbox("PAI", ["0: ROOT"] + w_opts)
@@ -104,32 +103,32 @@ if st.session_state.words:
             sel_idx = st.selectbox("FILHO", range(len(w_opts)), format_func=lambda x: w_opts[x])
             sel_morph = st.selectbox("CLASSE", list(MORPHO_COLORS.keys()))
         
-        st.divider()
         if st.button("VINCULAR 🔄", use_container_width=True):
             st.session_state.words[sel_idx]['head'] = sel_head.split(":")[0]
             st.session_state.words[sel_idx]['relation'] = sel_rel
             st.session_state.words[sel_idx]['postag'] = sel_morph
             st.rerun()
 
-    st.divider()
+        st.divider()
         st.markdown("### 📥 Exportar")
 
-        # --- BOTÃO XML ---
+        # Gerar XML
         xml_data = export_xml(st.session_state.words)
         st.download_button(
-            label="📦 Baixar XML Anotado",
+            label="📦 Baixar XML",
             data=xml_data,
-            file_name="arethusa_anotado.xml",
+            file_name="arethusa.xml",
             mime="application/xml",
             use_container_width=True
         )
-
+        
         # --- BOTÃO PNG ---
         # Geramos a imagem novamente em formato PNG (bytes)
         graph = render_tree(st.session_state.words, format_type='png')
         
         # O Graphviz no Streamlit às vezes retorna o caminho do arquivo, 
         # então lemos os bytes desse arquivo:
+        
         with open(graph, "rb") as f:
             png_bytes = f.read()
             
