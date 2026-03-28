@@ -133,6 +133,4 @@ if st.session_state.words:
         # Chamamos a função sem o parâmetro format_type para evitar o erro
         st.graphviz_chart(render_tree(st.session_state.words))
 
-    with col_view:
-        # Aqui a árvore terá 80% da largura da tela para brilhar
-        st.graphviz_chart(render_tree(st.session_state.words))
+    
