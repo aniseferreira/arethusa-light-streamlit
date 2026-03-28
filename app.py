@@ -1,10 +1,9 @@
 import streamlit as st
 import pandas as pd
-import re            # <--- MANTENHA ESTE (Processa o texto)
+import re
 from graphviz import Digraph
 import xml.etree.ElementTree as ET
-import tempfile      # <--- ADICIONE ESTE (Gera o arquivo PNG)
-import io            # <--- ADICIONE ESTE (Gera o arquivo XML)
+import io
 
 # 1. Configurações de Página
 st.set_page_config(layout="wide", page_title="Arethusa Editor")
