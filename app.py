@@ -31,21 +31,30 @@ if 'words' not in st.session_state:
     st.session_state.words = []
 
 # 3. Renderização Estável (Sem HTML complexo para não sumir)
-def render_tree(words):
-    dot = Digraph()
-    dot.attr(rankdir='TB', nodesep='0.5', ranksep='0.8')
-    # Fonte 14 ou 16 é o limite de segurança para o Streamlit não "espremer"
-    dot.attr('node', fontname='Alegreya', fontsize='18', shape='none') 
+
+def render_tree(words, format_type='svg'):
+    if not words: return None
+    dot = Digraph(format=format_type)
+    dot.attr(rankdir='TB', nodesep='1.0', ranksep='0.8')
+    dot.attr('node', fontname="serif", shape='none')
     
-    dot.node("0", "ROOT", fontcolor="red", fontsize="20")
+    dot.node("0", label="ROOT", fontcolor="red", fontsize="24")
     
     for w in words:
-        color = MORPHO_COLORS.get(w['postag'], "black")
-        # Rótulo simples que o Graphviz ama: Palavra + Relação
-        label = f"{w['form']}\n({w['relation']})"
-        dot.node(w['id'], label, fontcolor=color)
-        dot.edge(w['head'], w['id'], color="#cccccc")
-    return dot
+        txt_color = MORPHO_COLORS.get(w.get('postag', 'Substantivo'), "black")
+        # Rótulo com HTML para cores e negrito
+        label = f"<<table border='0' cellborder='0'><tr><td><font point-size='22' color='{txt_color}'><b>{w['form']}</b></font></td></tr><tr><td><font point-size='16' color='gray30'>{w['relation'] or '?'}</font></td></tr></table>>"
+        dot.node(w['id'], label)
+        dot.edge(w['head'] or "0", w['id'], color="#cccccc", penwidth='2.0')
+    
+    # Se for SVG, retorna o código para o Streamlit exibir
+    if format_type == 'svg':
+        return dot
+        
+    # Se for PNG, salva um arquivo temporário e retorna o caminho
+    temp = tempfile.NamedTemporaryFile(delete=False, suffix=f".{format_type}")
+    dot.render(temp.name.replace(f'.{format_type}', ''), format=format_type, cleanup=True)
+    return temp.name + f".{format_type}"
 
 import xml.etree.ElementTree as ET
 import io
