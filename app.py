@@ -50,7 +50,7 @@ def render_tree(words):
 st.title("🏛️ Arethusa Editor Light - Funcional")
 
 # --- BLOCO DE INSERÇÃO ---
-col_in1, col_in2 = st.columns([2, 1])
+col_in1, col_in2 = st.columns([1, 4])
 
 with col_in1:
     input_text = st.text_input("Sentença Grega:")
