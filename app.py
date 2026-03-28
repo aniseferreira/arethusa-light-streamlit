@@ -47,7 +47,7 @@ def render_tree(words):
         dot.edge(w['head'], w['id'], color="#cccccc")
     return dot
 
-st.title("🏛️ Arethusa Editor - Funcional")
+st.title("🏛️ Arethusa Editor Light - Funcional")
 
 # --- BLOCO DE INSERÇÃO ---
 col_in1, col_in2 = st.columns([2, 1])
