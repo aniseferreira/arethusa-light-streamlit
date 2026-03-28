@@ -2,13 +2,14 @@ import streamlit as st
 from graphviz import Digraph
 import re
 
-# 1. Configurações Visuais da Página
+# 1. Configurações Visuais da Página (Fontes Maiores)
 st.set_page_config(layout="wide", page_title="Arethusa Editor")
 st.markdown("""
     <style>
     .stApp { font-size: 20px !important; }
-    .stSelectbox label { font-size: 24px !important; font-weight: bold; color: #d32f2f !important; }
-    button { height: 3em !important; width: 100% !important; font-weight: bold !important; }
+    /* Estilo para os labels dos campos de seleção */
+    .stSelectbox label { font-size: 22px !important; font-weight: bold; color: #1E88E5 !important; }
+    button { height: 3em !important; font-weight: bold !important; font-size: 18px !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -26,31 +27,29 @@ RELATIONS = sorted(["PRED", "SBJ", "OBJ", "ADV", "ATR", "PNOM", "COORD", "APOS",
 if 'words' not in st.session_state:
     st.session_state.words = []
 
-# 3. Função de Renderização Robusta
+# 3. Função de Renderização (Fontes Robustas)
 def render_tree(words):
-    # Criamos o gráfico com DPI alto para não ficar embaçado
     dot = Digraph(format='svg')
     dot.attr(dpi='300')
-    
-    # Configurações globais: Letra tamanho 28 para os nós
-    dot.attr('node', shape='plain', fontname='Arial', fontsize='28')
+    # Forçamos o tamanho da fonte global para 30 (bem visível)
+    dot.attr('node', shape='none', fontname='Arial', fontsize='30')
     dot.attr('edge', color='#cccccc', penwidth='2.0')
     
     # Nó Raiz
-    dot.node("0", "ROOT", fontcolor="red", fontsize="32", fontname="Arial-Bold")
+    dot.node("0", "ROOT", fontcolor="red", fontsize="34", fontname="Arial-Bold")
     
     for w in words:
         color = MORPHO_COLORS.get(w['postag'], "black")
-        # Label simples: Palavra em cima, Relação embaixo entre parênteses
-        # O '\n' cria a quebra de linha que o Graphviz entende nativamente
-        clean_label = f"{w['form']}\n({w['relation']})"
+        # Criamos o label com a palavra grande e a relação menor abaixo
+        # O uso de HTML-like label aqui é mais seguro no Streamlit
+        label = f'<<table border="0" cellborder="0"><tr><td><font point-size="32" color="{color}"><b>{w["form"]}</b></font></td></tr><tr><td><font point-size="18" color="#666666">{w["relation"]}</font></td></tr></table>>'
         
-        dot.node(w['id'], clean_label, fontcolor=color)
+        dot.node(w['id'], label)
         dot.edge(w['head'], w['id'])
         
     return dot
 
-st.title("🏛️ Arethusa Editor - Versão Estável")
+st.title("🏛️ Arethusa Editor - Streamlit")
 
 # 4. Entrada de Dados
 input_text = st.text_input("1. DIGITE A SENTENÇA GREGA:", placeholder="Ex: ἐν ἀρχῇ ἦν ὁ λόγος")
@@ -68,13 +67,21 @@ if st.session_state.words:
         
         # --- ORDEM INVERTIDA: PAI PRIMEIRO ---
         h_options = ["0: ROOT"] + w_options
-        new_head = st.selectbox("A. PALAVRA PAI (HEAD)", h_options)
+        new_head = st.selectbox("A. ESCOLHA A PALAVRA PAI (HEAD)", h_options)
         
-        target_idx = st.selectbox("B. PALAVRA FILHO (DEPENDENTE)", range(len(w_options)), format_func=lambda x: w_options[x])
+        target_idx = st.selectbox("B. ESCOLHA A PALAVRA FILHO (DEPENDENTE)", range(len(w_options)), format_func=lambda x: w_options[x])
         
         new_rel = st.selectbox("C. TIPO DE RELAÇÃO", RELATIONS)
         new_morph = st.selectbox("D. CLASSE GRAMATICAL", list(MORPHO_COLORS.keys()))
         
         if st.button("ATUALIZAR ÁRVORE 🔄"):
+            # CORREÇÃO DO ERRO NAMEERROR AQUI:
             st.session_state.words[target_idx]['head'] = new_head.split(":")[0]
-            st.session_state.words[target_idx]['relation'] = new
+            st.session_state.words[target_idx]['relation'] = new_rel
+            st.session_state.words[target_idx]['postag'] = new_morph
+            st.rerun()
+
+    with col_tree:
+        st.subheader("Visualização da Árvore")
+        # Exibe a árvore ocupando a largura da coluna
+        st.graphviz_chart(render_tree(st.session_state.words), use_container_width=True)
