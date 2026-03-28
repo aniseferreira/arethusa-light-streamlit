@@ -47,6 +47,24 @@ def render_tree(words):
         dot.edge(w['head'], w['id'], color="#cccccc")
     return dot
 
+import xml.etree.ElementTree as ET
+import io
+
+def export_xml(words):
+    root = ET.Element("treebank")
+    s = ET.SubElement(root, "sentence", id="1")
+    for w in words:
+        ET.SubElement(s, "word", 
+                      id=str(w['id']), 
+                      form=w['form'], 
+                      head=str(w['head']), 
+                      relation=w['relation'], 
+                      postag=w['postag'])
+    
+    # Transforma o XML em string e depois em bytes para o download
+    xml_str = ET.tostring(root, encoding='utf-8')
+    return xml_str
+
 st.title("🏛️ Arethusa Editor Light - Funcional")
 
 # --- BLOCO DE INSERÇÃO ---
@@ -92,6 +110,36 @@ if st.session_state.words:
             st.session_state.words[sel_idx]['relation'] = sel_rel
             st.session_state.words[sel_idx]['postag'] = sel_morph
             st.rerun()
+
+    st.divider()
+        st.markdown("### 📥 Exportar")
+
+        # --- BOTÃO XML ---
+        xml_data = export_xml(st.session_state.words)
+        st.download_button(
+            label="📦 Baixar XML Anotado",
+            data=xml_data,
+            file_name="arethusa_anotado.xml",
+            mime="application/xml",
+            use_container_width=True
+        )
+
+        # --- BOTÃO PNG ---
+        # Geramos a imagem novamente em formato PNG (bytes)
+        graph = render_tree(st.session_state.words, format_type='png')
+        
+        # O Graphviz no Streamlit às vezes retorna o caminho do arquivo, 
+        # então lemos os bytes desse arquivo:
+        with open(graph, "rb") as f:
+            png_bytes = f.read()
+            
+        st.download_button(
+            label="🖼️ Baixar Árvore (PNG)",
+            data=png_bytes,
+            file_name="arvore_sintatica.png",
+            mime="image/png",
+            use_container_width=True
+        )
 
     with col_view:
         # Aqui a árvore terá 80% da largura da tela para brilhar
