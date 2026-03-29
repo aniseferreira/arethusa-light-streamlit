@@ -98,7 +98,7 @@ if st.session_state.words:
     col_edit, col_view = st.columns([1, 4])
     
     with col_edit:
-        st.markdown("### ⚙️ Dependências e Classe")
+        st.markdown("### ⚙️ Anotar")
         w_opts = [f"{w['id']}: {w['form']}" for w in st.session_state.words]
         
         c1, c2 = st.columns(2)
@@ -128,7 +128,7 @@ if st.session_state.words:
             use_container_width=True
         )
         
-        st.info("💡 Para salvar a imagem, clique com o botão direito na árvore e selecione 'Salvar imagem como'.")
+        st.info("💡 Para salvar a imagem, clique no ícone fullscreen, capture a tela ou imprima como PDF.")
 
     with col_view:
         # Aqui a árvore terá 80% da largura da tela para brilhar
