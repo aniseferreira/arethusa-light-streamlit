@@ -71,7 +71,7 @@ def export_xml(words):
     return xml_str
 
 st.title("🏛️ Arethusa Editor de Treebank AGDT Light")
-st.markdown(" [Ver diretrizes de anotação AGDT2](https://github.com/PerseusDL/treebank_data/blob/master/AGDT2/guidelines/Greek_guidelines.md#3-prague-syntactic-layer)/ [ AGDT1 em inglês](https://github.com/PerseusDL/treebank_data/blob/master/v1/greek/docs/guidelines.pdf)/ [ AGDT1 em por-br](treebank_guidelines_translated/Manual_AGDT(1)Feb_2015(rev18).pdf")
+st.markdown(" [Ver diretrizes de anotação AGDT2](https://github.com/PerseusDL/treebank_data/blob/master/AGDT2/guidelines/Greek_guidelines.md#3-prague-syntactic-layer)/ [ AGDT1 em inglês](https://github.com/PerseusDL/treebank_data/blob/master/v1/greek/docs/guidelines.pdf)/ [ AGDT1 em por-br](https://github.com/aniseferreira/LetrasClassicasDigitais/blob/master/treebank_guidelines_translated/Manual_AGDT(1)Feb_2015(rev18).pdf)")
 
 # --- BLOCO DE INSERÇÃO ---
 col_in1, col_in2 = st.columns([2, 1])
