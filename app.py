@@ -21,6 +21,7 @@ MORPHO_COLORS = {
     "Partícula": "goldenrod",       # Mantido (Dourado)
     "Pontuação": "black",           # Mantido
     "Artificial": "purple"          # Mantido
+    "Numeral": "#00FF00"            # Verde Neon adicionado aqui
 }
 
 # 2. TODAS AS ETIQUETAS QUE VOCÊ PRECISA
