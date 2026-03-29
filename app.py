@@ -77,7 +77,6 @@ st.markdown(" [Ver diretrizes de anotação](https://github.com/PerseusDL/treeba
 col_in1, col_in2 = st.columns([2, 1])
 
 with col_in1:
-    st.markdown(".stTextInput > label {font-size:120%; font-weight:bold;}", unsafe_allow_html=True)
     input_text = st.text_input("Inserir aqui sentença Grega:")
     if st.button("GERAR TOKENS 🚀"):
         tokens = re.findall(r"[\w\u0370-\u03FF]+|[.,;:·!?]", input_text)
