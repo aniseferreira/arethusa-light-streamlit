@@ -71,6 +71,7 @@ def export_xml(words):
     return xml_str
 
 st.title("🏛️ Arethusa Editor de Treebank AGDT Light")
+st.subheader("Ver Guidelines")
 
 # --- BLOCO DE INSERÇÃO ---
 col_in1, col_in2 = st.columns([2, 1])
