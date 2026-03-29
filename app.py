@@ -20,7 +20,7 @@ MORPHO_COLORS = {
     "Conjunção": "hotpink",         # Hot Pink (Rosa forte)
     "Partícula": "goldenrod",       # Mantido (Dourado)
     "Pontuação": "black",           # Mantido
-    "Artificial": "purple"          # Mantido
+    "Artificial": "purple",          # Mantido
     "Numeral": "#00FF00"            # Verde Neon adicionado aqui
 }
 
