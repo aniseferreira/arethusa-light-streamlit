@@ -98,7 +98,7 @@ if st.session_state.words:
     col_edit, col_view = st.columns([1, 4])
     
     with col_edit:
-        st.markdown("### ⚙️ Anotar")
+        st.markdown("#### ⚙️ Etiquetar e vincular dependências")
         w_opts = [f"{w['id']}: {w['form']}" for w in st.session_state.words]
         
         c1, c2 = st.columns(2)
@@ -116,7 +116,7 @@ if st.session_state.words:
             st.rerun()
 
         st.divider()
-        st.markdown("### 📥 Exportar")
+        st.markdown("#### 📥 Exportar")
 
         # Gerar XML (Isso funciona perfeitamente)
         xml_data = export_xml(st.session_state.words)
@@ -128,7 +128,7 @@ if st.session_state.words:
             use_container_width=True
         )
         
-        st.info("💡 Para salvar a imagem, clique no ícone fullscreen, capture a tela ou imprima como PDF.")
+        st.info("💡 Para salvar a imagem, clique no ícone fullscreen ao lado da árvore, capture a imagem ou imprima como PDF.")
 
     with col_view:
         # Aqui a árvore terá 80% da largura da tela para brilhar
