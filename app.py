@@ -70,7 +70,7 @@ def export_xml(words):
     xml_str = ET.tostring(root, encoding='utf-8')
     return xml_str
 
-st.title("🏛️ Arethusa Editor Light - Funcional")
+st.title("🏛️ Arethusa Editor de Treebank AGDT Light")
 
 # --- BLOCO DE INSERÇÃO ---
 col_in1, col_in2 = st.columns([2, 1])
