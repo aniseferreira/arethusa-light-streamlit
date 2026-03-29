@@ -71,13 +71,16 @@ def export_xml(words):
     return xml_str
 
 st.title("🏛️ Arethusa Editor de Treebank AGDT Light")
-st.subheader("Ver Guidelines")
+st.markdown("## [Ver diretrizes de anotação](https://github.com/PerseusDL/treebank_data/blob/master/AGDT2/guidelines/Greek_guidelines.md#3-prague-syntactic-layer)")
+st.markdown("### Depois de inserir a sentença, clique em gerar tokens para criar a árvore")
+st.markdown("### Faça a anotação escolhendo cada termo para pai e filho e vincular em seguida")
+
 
 # --- BLOCO DE INSERÇÃO ---
 col_in1, col_in2 = st.columns([2, 1])
 
 with col_in1:
-    input_text = st.text_input("Sentença Grega:")
+    input_text = st.text_input("Inserir aqui sentença Grega:")
     if st.button("GERAR TOKENS 🚀"):
         tokens = re.findall(r"[\w\u0370-\u03FF]+|[.,;:·!?]", input_text)
         st.session_state.words = [{"id": str(i+1), "form": t, "postag": "Substantivo", "head": "0", "relation": "ROOT"} for i, t in enumerate(tokens)]
