@@ -8,7 +8,6 @@ import io
 # 1. Configurações de Página
 st.set_page_config(layout="wide", page_title="Arethusa Editor")
 
-# Cores Filológicas (Atualizadas com Numeral Neon)
 MORPHO_COLORS = {
     "Substantivo": "forestgreen",   
     "Verbo": "crimson",             
@@ -33,22 +32,20 @@ RELATIONS = sorted([
 def get_color_by_postag(postag):
     return MORPHO_COLORS.get(postag, "black")
 
-# 2. FUNÇÃO DE RENDERIZAÇÃO ATUALIZADA (PROGRESSIVA + ALEGREYA + TB)
+# 2. RENDERIZAÇÃO CORRIGIDA (ROOT DISCRETO + PROGRESSIVA)
 def render_tree(words):
     if not words:
         return None
     
-    # Criamos o objeto usando o import 'graphviz'
     dot = graphviz.Digraph(format='svg')
-    dot.attr(rankdir='TB', nodesep='0.5', ranksep='0.6')
+    dot.attr(rankdir='TB', nodesep='0.4', ranksep='0.4')
     dot.attr('node', fontname='Alegreya', fontsize='16') 
 
-    # Nó mestre [ROOT]
-    dot.node('0', '[ROOT]', shape='doublecircle', color='black', fontcolor='black', fontsize='12')
+    # ROOT Simples para não deformar a árvore
+    dot.node('0', '[ROOT]', shape='none', fontcolor='black', fontsize='12', width='0.5')
 
     for w in words:
-        # LÓGICA PROGRESSIVA:
-        # Só desenha o nó se tiver pai definido, ou se for Predicado/Pontuação essencial
+        # Só aparece o que já tem pai, ou é predicado/pontuação
         tem_pai = w.get('head') not in ["", None, "0"]
         conectado_ao_root = w.get('head') == "0"
         e_essencial = w.get('relation') in ['AuxK', 'PRED']
@@ -59,12 +56,10 @@ def render_tree(words):
         node_id = str(w['id'])
         color = get_color_by_postag(w.get('postag', ''))
         
-        # Label com Form em Negrito
         label = f"<<table border='0' cellborder='0'><tr><td><b>{w['form']}</b></td></tr><tr><td><font point-size='10'>{w['relation']}</font></td></tr></table>>"
         
         dot.node(node_id, label=label, shape='none', fontcolor=color)
         
-        # Cria a linha se houver um head definido
         if w.get('head') not in ["", None]:
             dot.edge(str(w['head']), node_id)
 
@@ -80,10 +75,9 @@ def export_xml(words):
                       head=str(w['head']), 
                       relation=w['relation'],
                       postag=w['postag'])
-    
     return ET.tostring(root, encoding='utf-8', xml_declaration=True)
 
-# 3. INTERFACE
+# 3. INTERFACE (ORDEM DOS MENUS CORRIGIDA)
 st.title("🏛️ Arethusa Lite (Editor)")
 
 if 'words' not in st.session_state:
@@ -105,10 +99,16 @@ with st.sidebar:
         st.header("3. Anotação")
         w_opts = [f"{w['id']}: {w['form']}" for w in st.session_state.words]
         
-        sel_idx = st.selectbox("FILHO", range(len(w_opts)), format_func=lambda x: w_opts[x])
-        sel_head = st.selectbox("PAI", ["0: ROOT"] + w_opts)
-        sel_rel = st.selectbox("RELAÇÃO", RELATIONS)
-        sel_morph = st.selectbox("CLASSE", list(MORPHO_COLORS.keys()))
+        # --- ORDEM DOS MENUS QUE VOCÊ PREFERE ---
+        c1, c2 = st.columns(2)
+        with c1:
+            sel_head = st.selectbox("PAI", ["0: ROOT"] + w_opts)
+            sel_rel = st.selectbox("RELAÇÃO", RELATIONS)
+        with c2:
+            sel_morph = st.selectbox("CLASSE", list(MORPHO_COLORS.keys()))
+        
+        # Filho embaixo para maior destaque
+        sel_idx = st.selectbox("FILHO (Palavra a ser anotada)", range(len(w_opts)), format_func=lambda x: w_opts[x])
         
         if st.button("VINCULAR 🔄", use_container_width=True):
             st.session_state.words[sel_idx]['head'] = sel_head.split(":")[0]
@@ -116,19 +116,12 @@ with st.sidebar:
             st.session_state.words[sel_idx]['postag'] = sel_morph
             st.rerun()
 
-# 4. ÁREA VISUAL (Ocupando a largura total)
+        st.divider()
+        xml_data = export_xml(st.session_state.words)
+        st.download_button(label="📦 Baixar XML", data=xml_data, file_name="arethusa.xml", mime="application/xml", use_container_width=True)
+
+# 4. ÁREA VISUAL
 if st.session_state.words:
     dot_objeto = render_tree(st.session_state.words)
     if dot_objeto:
         st.graphviz_chart(dot_objeto, use_container_width=True)
-    
-    st.divider()
-    st.markdown("#### 📥 Exportar")
-    xml_data = export_xml(st.session_state.words)
-    st.download_button(
-        label="📦 Baixar XML",
-        data=xml_data,
-        file_name="arethusa.xml",
-        mime="application/xml",
-        use_container_width=True
-    )
