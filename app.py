@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import re
-from graphviz import Digraph
+import graphviz  # <--- Mude de 'from graphviz import Digraph' para isso
 import xml.etree.ElementTree as ET
 import io
 
