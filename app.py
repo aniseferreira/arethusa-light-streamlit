@@ -36,21 +36,44 @@ if 'words' not in st.session_state:
 
 # 3. Renderização Estável (Sem HTML complexo para não sumir)
 
-def render_tree(words):
-    if not words: return None
-    dot = Digraph()
-    dot.attr(rankdir='TB', nodesep='0.8', ranksep='0.6')
-    dot.attr('node', fontname="serif", shape='none')
+defdef render_tree(words):
+    if not words:
+        return None
     
-    dot.node("0", label="ROOT", fontcolor="red", fontsize="20")
-    
+    # Criamos o gráfico. BT = Bottom to Top (Raiz em cima)
+    dot = graphviz.Digraph(format='svg')
+    dot.attr(rankdir='TB', nodesep='0.5', ranksep='0.6')
+    dot.attr('node', fontname='Alegreya', fontsize='16') # Fonte maior para a faculdade
+
+    # Criamos o nó mestre [ROOT]
+    dot.node('0', '[ROOT]', shape='doublecircle', color='black', fontcolor='black', fontsize='16')
+
     for w in words:
-        txt_color = MORPHO_COLORS.get(w.get('postag', 'Substantivo'), "black")
-        # Label formatada para o Streamlit
-        label = f'<<table border="0" cellborder="0"><tr><td><font point-size="20" color="{txt_color}"><b>{w["form"]}</b></font></td></tr><tr><td><font point-size="14" color="gray30">{w["relation"] or "?"}</font></td></tr></table>>'
-        dot.node(str(w['id']), label)
-        dot.edge(str(w['head'] or "0"), str(w['id']), color="#cccccc", penwidth='1.5')
+        # REGRA: Só aparece se tiver pai, se for Predicado ou se for Pontuação
+        tem_pai = w.get('head') not in ["", None]
+        e_essencial = w.get('relation') in ['AuxK', 'PRED']
+        
+        if not (tem_pai or e_essencial):
+            continue 
+
+        node_id = str(w['id'])
+        # (Aqui entra sua lógica de cores que já temos...)
+        color = get_color_by_postag(w.get('postag', ''))
+        
+        # Rótulo com Form em Negrito
+        label = f"<<table border='0' cellborder='0'><tr><td><b>{w['form']}</b></td></tr><tr><td><font point-size='10'>{w['relation']}</font></td></tr></table>>"
+        
+        dot.node(node_id, label=label, shape='none', fontcolor=color)
+        
+        # Conecta ao pai
+        if tem_pai:
+            dot.edge(str(w['head']), node_id)
+
     return dot
+
+# NA PARTE DE EXIBIÇÃO (Final do arquivo):
+# Use use_container_width=True para ocupar a tela toda do monitor
+st.graphviz_chart(dot, use_container_width=True)
 
 import xml.etree.ElementTree as ET
 import io
