@@ -36,7 +36,7 @@ if 'words' not in st.session_state:
 
 # 3. Renderização Estável (Sem HTML complexo para não sumir)
 
-defdef render_tree(words):
+def render_tree(words):
     if not words:
         return None
     
