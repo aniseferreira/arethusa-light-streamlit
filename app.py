@@ -40,40 +40,39 @@ def render_tree(words):
     if not words:
         return None
     
-    # Criamos o gráfico. TB = Top to bottom (Raiz em cima)
+    # TB = Top to Bottom (O ROOT fica no topo, as palavras descem)
     dot = graphviz.Digraph(format='svg')
     dot.attr(rankdir='TB', nodesep='0.5', ranksep='0.6')
-    dot.attr('node', fontname='Alegreya', fontsize='16') # Fonte maior para a faculdade
+    
+    # Usando Alegreya e um tamanho maior para os monitores da faculdade
+    dot.attr('node', fontname='Alegreya', fontsize='16') 
 
-    # Criamos o nó mestre [ROOT]
-    dot.node('0', '[ROOT]', shape='doublecircle', color='black', fontcolor='black', fontsize='16')
+    # Nó mestre [ROOT]
+    dot.node('0', '[ROOT]', shape='doublecircle', color='black', fontcolor='black', fontsize='12')
 
     for w in words:
-        # REGRA: Só aparece se tiver pai, se for Predicado ou se for Pontuação
-        tem_pai = w.get('head') not in ["", None]
+        # LÓGICA PROGRESSIVA: 
+        # Só desenha se tiver pai, se for Predicado ou se for Pontuação
+        tem_pai = w.get('head') not in ["", None, "0"]
+        conectado_ao_root = w.get('head') == "0"
         e_essencial = w.get('relation') in ['AuxK', 'PRED']
         
-        if not (tem_pai or e_essencial):
+        if not (tem_pai or conectado_ao_root or e_essencial):
             continue 
 
         node_id = str(w['id'])
-        # (Aqui entra sua lógica de cores que já temos...)
         color = get_color_by_postag(w.get('postag', ''))
         
-        # Rótulo com Form em Negrito
+        # Label com Form em Negrito (HTML-like label do Graphviz)
         label = f"<<table border='0' cellborder='0'><tr><td><b>{w['form']}</b></td></tr><tr><td><font point-size='10'>{w['relation']}</font></td></tr></table>>"
         
         dot.node(node_id, label=label, shape='none', fontcolor=color)
         
-        # Conecta ao pai
-        if tem_pai:
+        # Cria a linha se houver um head definido
+        if w.get('head') not in ["", None]:
             dot.edge(str(w['head']), node_id)
 
     return dot
-
-# NA PARTE DE EXIBIÇÃO (Final do arquivo):
-# Use use_container_width=True para ocupar a tela toda do monitor
-st.graphviz_chart(dot, use_container_width=True)
 
 import xml.etree.ElementTree as ET
 import io
