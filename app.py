@@ -1,58 +1,54 @@
 import streamlit as st
 import pandas as pd
 import re
-import graphviz  # <--- Mude de 'from graphviz import Digraph' para isso
+import graphviz
 import xml.etree.ElementTree as ET
 import io
 
 # 1. Configurações de Página
 st.set_page_config(layout="wide", page_title="Arethusa Editor")
 
-# Cores Filológicas (Mantendo a estética)
+# Cores Filológicas (Atualizadas com Numeral Neon)
 MORPHO_COLORS = {
-    "Substantivo": "forestgreen",   # Verde Floresta
-    "Verbo": "crimson",             # Mantido (Vermelho)
-    "Adjetivo": "royalblue",        # Azul Royal
-    "Artigo": "darkcyan",           # Ciano Escuro (que dá o tom azul claro)
-    "Pronome": "#8C2E64",           # Bordeaux (seu código específico)
-    "Advérbio": "darkorange",       # Mantido
-    "Preposição": "#006060",        # Verde Petróleo (Teal escuro)
-    "Conjunção": "hotpink",         # Hot Pink (Rosa forte)
-    "Partícula": "goldenrod",       # Mantido (Dourado)
-    "Pontuação": "black",           # Mantido
-    "Artificial": "purple",          # Mantido
-    "Numeral": "#00FF00"            # Verde Neon adicionado aqui
+    "Substantivo": "forestgreen",   
+    "Verbo": "crimson",             
+    "Adjetivo": "royalblue",        
+    "Artigo": "darkcyan",           
+    "Pronome": "#8C2E64",           
+    "Advérbio": "darkorange",       
+    "Preposição": "#006060",        
+    "Conjunção": "hotpink",         
+    "Partícula": "goldenrod",       
+    "Pontuação": "black",           
+    "Artificial": "purple",          
+    "Numeral": "#00FF00"            
 }
 
-# 2. TODAS AS ETIQUETAS QUE VOCÊ PRECISA
 RELATIONS = sorted([
     "PRED", "SBJ", "OBJ", "ADV", "ATR", "PNOM", "COORD", "APOS", 
-    "PRED_CO", "SBJ_CO", "OBJ_CO", "ADV_CO", "ATR_CO", "PNOM_CO", 
-    "AuxP", "AuxC", "AuxY", "AuxZ", "AuxG", "AuxK", "AuxX", "ExD", "OBJ_AP", "SBJ_AP"
+    "PRED_CO", "SBJ_CO", "OBJ_CO", "ADV_CO", "ATR_CO", "PNOM_CO", "COORD_CO", "APOS_CO",
+    "AuxK", "AuxX", "AuxY", "AuxZ", "AuxG", "AuxC", "AuxV", "AuxP", "ExD"
 ])
 
-if 'words' not in st.session_state:
-    st.session_state.words = []
+def get_color_by_postag(postag):
+    return MORPHO_COLORS.get(postag, "black")
 
-# 3. Renderização Estável (Sem HTML complexo para não sumir)
-
+# 2. FUNÇÃO DE RENDERIZAÇÃO ATUALIZADA (PROGRESSIVA + ALEGREYA + TB)
 def render_tree(words):
     if not words:
         return None
     
-    # TB = Top to Bottom (O ROOT fica no topo, as palavras descem)
+    # Criamos o objeto usando o import 'graphviz'
     dot = graphviz.Digraph(format='svg')
     dot.attr(rankdir='TB', nodesep='0.5', ranksep='0.6')
-    
-    # Usando Alegreya e um tamanho maior para os monitores da faculdade
     dot.attr('node', fontname='Alegreya', fontsize='16') 
 
     # Nó mestre [ROOT]
     dot.node('0', '[ROOT]', shape='doublecircle', color='black', fontcolor='black', fontsize='12')
 
     for w in words:
-        # LÓGICA PROGRESSIVA: 
-        # Só desenha se tiver pai, se for Predicado ou se for Pontuação
+        # LÓGICA PROGRESSIVA:
+        # Só desenha o nó se tiver pai definido, ou se for Predicado/Pontuação essencial
         tem_pai = w.get('head') not in ["", None, "0"]
         conectado_ao_root = w.get('head') == "0"
         e_essencial = w.get('relation') in ['AuxK', 'PRED']
@@ -63,7 +59,7 @@ def render_tree(words):
         node_id = str(w['id'])
         color = get_color_by_postag(w.get('postag', ''))
         
-        # Label com Form em Negrito (HTML-like label do Graphviz)
+        # Label com Form em Negrito
         label = f"<<table border='0' cellborder='0'><tr><td><b>{w['form']}</b></td></tr><tr><td><font point-size='10'>{w['relation']}</font></td></tr></table>>"
         
         dot.node(node_id, label=label, shape='none', fontcolor=color)
@@ -74,62 +70,45 @@ def render_tree(words):
 
     return dot
 
-import xml.etree.ElementTree as ET
-import io
-
 def export_xml(words):
-    root = ET.Element("treebank")
-    s = ET.SubElement(root, "sentence", id="1")
+    root = ET.Element("treebank", version="1.5", lang="grc")
+    sentence = ET.SubElement(root, "sentence", id="1", document_id="arethusa")
     for w in words:
-        ET.SubElement(s, "word", 
+        ET.SubElement(sentence, "word", 
                       id=str(w['id']), 
                       form=w['form'], 
                       head=str(w['head']), 
-                      relation=w['relation'], 
+                      relation=w['relation'],
                       postag=w['postag'])
     
-    # Transforma o XML em string e depois em bytes para o download
-    xml_str = ET.tostring(root, encoding='utf-8')
-    return xml_str
+    return ET.tostring(root, encoding='utf-8', xml_declaration=True)
 
-st.title("🏛️ Arethusa Editor de Treebank AGDT Light")
-st.markdown(" [Ver diretrizes de anotação AGDT2](https://github.com/PerseusDL/treebank_data/blob/master/AGDT2/guidelines/Greek_guidelines.md#3-prague-syntactic-layer)/ [ AGDT1 em inglês](https://github.com/PerseusDL/treebank_data/blob/master/v1/greek/docs/guidelines.pdf)/ [ AGDT1 em por-br](https://github.com/aniseferreira/LetrasClassicasDigitais/blob/master/treebank_guidelines_translated/Manual_AGDT(1)Feb_2015(rev18).pdf)")
+# 3. INTERFACE
+st.title("🏛️ Arethusa Lite (Editor)")
 
-# --- BLOCO DE INSERÇÃO ---
-col_in1, col_in2 = st.columns([2, 1])
+if 'words' not in st.session_state:
+    st.session_state.words = []
 
-with col_in1:
-    input_text = st.text_input("Inserir aqui sentença Grega:")
-    if st.button("GERAR TOKENS 🚀"):
-        tokens = re.findall(r"[\w\u0370-\u03FF]+|[.,;:·!?]", input_text)
-        st.session_state.words = [{"id": str(i+1), "form": t, "postag": "Substantivo", "head": "0", "relation": "ROOT"} for i, t in enumerate(tokens)]
+with st.sidebar:
+    st.header("1. Texto Fonte")
+    text_input = st.text_area("Cole a sentença grega:", height=150)
+    if st.button("GERAR TOKENS ⚡", use_container_width=True):
+        tokens = re.findall(r"[\w\u0370-\u03FF\u1F00-\u1FFF]+|[.,;:·]", text_input)
+        st.session_state.words = [
+            {"id": i+1, "form": t, "head": "", "relation": "", "postag": ""} 
+            for i, t in enumerate(tokens)
+        ]
         st.rerun()
 
-with col_in2:
-    at_val = st.text_input("Token Artificial:", value="[aT1]")
-    if st.button("INSERIR aT ➕"):
-        new_id = str(len(st.session_state.words) + 1)
-        st.session_state.words.append({"id": new_id, "form": at_val, "postag": "Artificial", "head": "0", "relation": "COORD"})
-        st.rerun()
-
-st.divider()
-
-# --- ÁREA DE ANOTAÇÃO ---
-if st.session_state.words:
-    # Definindo 1 para controles e 4 para a árvore (espaço máximo)
-    col_edit, col_view = st.columns([1, 4])
-    
-    with col_edit:
-        st.markdown("#### ⚙️ Etiquetar e vincular dependências")
+    if st.session_state.words:
+        st.divider()
+        st.header("3. Anotação")
         w_opts = [f"{w['id']}: {w['form']}" for w in st.session_state.words]
         
-        c1, c2 = st.columns(2)
-        with c1:
-            sel_head = st.selectbox("PAI", ["0: ROOT"] + w_opts)
-            sel_rel = st.selectbox("RELAÇÃO", RELATIONS)
-        with c2:
-            sel_idx = st.selectbox("FILHO", range(len(w_opts)), format_func=lambda x: w_opts[x])
-            sel_morph = st.selectbox("CLASSE", list(MORPHO_COLORS.keys()))
+        sel_idx = st.selectbox("FILHO", range(len(w_opts)), format_func=lambda x: w_opts[x])
+        sel_head = st.selectbox("PAI", ["0: ROOT"] + w_opts)
+        sel_rel = st.selectbox("RELAÇÃO", RELATIONS)
+        sel_morph = st.selectbox("CLASSE", list(MORPHO_COLORS.keys()))
         
         if st.button("VINCULAR 🔄", use_container_width=True):
             st.session_state.words[sel_idx]['head'] = sel_head.split(":")[0]
@@ -137,24 +116,19 @@ if st.session_state.words:
             st.session_state.words[sel_idx]['postag'] = sel_morph
             st.rerun()
 
-        st.divider()
-        st.markdown("#### 📥 Exportar")
-
-        # Gerar XML (Isso funciona perfeitamente)
-        xml_data = export_xml(st.session_state.words)
-        st.download_button(
-            label="📦 Baixar XML",
-            data=xml_data,
-            file_name="arethusa.xml",
-            mime="application/xml",
-            use_container_width=True
-        )
-        
-        st.info("💡 Para salvar a imagem, clique no ícone fullscreen ao lado da árvore, capture a imagem ou imprima como PDF.")
-
-    with col_view:
-        # Aqui a árvore terá 80% da largura da tela para brilhar
-        # Chamamos a função sem o parâmetro format_type para evitar o erro
-        st.graphviz_chart(render_tree(st.session_state.words))
-
+# 4. ÁREA VISUAL (Ocupando a largura total)
+if st.session_state.words:
+    dot_objeto = render_tree(st.session_state.words)
+    if dot_objeto:
+        st.graphviz_chart(dot_objeto, use_container_width=True)
     
+    st.divider()
+    st.markdown("#### 📥 Exportar")
+    xml_data = export_xml(st.session_state.words)
+    st.download_button(
+        label="📦 Baixar XML",
+        data=xml_data,
+        file_name="arethusa.xml",
+        mime="application/xml",
+        use_container_width=True
+    )
