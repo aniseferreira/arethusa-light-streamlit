@@ -40,7 +40,7 @@ def render_tree(words):
     if not words:
         return None
     
-    # Criamos o gráfico. BT = Bottom to Top (Raiz em cima)
+    # Criamos o gráfico. TB = Top to bottom (Raiz em cima)
     dot = graphviz.Digraph(format='svg')
     dot.attr(rankdir='TB', nodesep='0.5', ranksep='0.6')
     dot.attr('node', fontname='Alegreya', fontsize='16') # Fonte maior para a faculdade
