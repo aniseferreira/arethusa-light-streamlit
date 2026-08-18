@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 import io
 
 # 1. Configurações de Página
-st.set_page_config(layout="wide", page_title="Arethusa Editor")
+st.set_page_config(page_icon="👁️𐂷", layout="wide", page_title="Arethusa Editor")
 
 MORPHO_COLORS = {
     "Substantivo": "forestgreen", "Verbo": "crimson", "Adjetivo": "royalblue",
