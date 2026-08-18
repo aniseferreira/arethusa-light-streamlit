@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 import io
 
 # 1. Configurações de Página
-st.set_page_config(page_icon="𐂷", layout="wide", page_title="Arethusa Editor")
+st.set_page_config(page_icon="🏛️",, layout="wide", page_title="Arethusa Editor")
 
 MORPHO_COLORS = {
     "Substantivo": "forestgreen", "Verbo": "crimson", "Adjetivo": "royalblue",
@@ -58,7 +58,7 @@ def export_xml(words):
         ET.SubElement(s, "word", id=str(w['id']), form=w['form'], head=str(w['head']), relation=w['relation'], postag=w['postag'])
     return ET.tostring(root, encoding='utf-8')
 
-st.title("𐂷 Arethusa Editor de Treebank AGDT Light")
+st.title("🏛️ Arethusa Editor de Treebank AGDT Light")
 st.markdown(" [Ver diretrizes de anotação AGDT2](https://github.com/PerseusDL/treebank_data/blob/master/AGDT2/guidelines/Greek_guidelines.md#3-prague-syntactic-layer)/ [ AGDT1 em inglês](https://github.com/PerseusDL/treebank_data/blob/master/v1/greek/docs/guidelines.pdf)/ [ AGDT1 em por-br](https://github.com/aniseferreira/LetrasClassicasDigitais/blob/master/treebank_guidelines_translated/Manual_AGDT(1)Feb_2015(rev18).pdf)")
 
 col_in1, col_in2 = st.columns([2, 1])
